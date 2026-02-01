@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduMethod — Методические материалы</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4A90E2;
+            --bg: #f9fbff;
+            --text: #333;
+            --overlay: rgba(0, 0, 0, 0.4);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background-color: var(--bg);
+            color: var(--text);
+            transition: 0.3s;
+        }
+
+        header {
+            background: #fff;
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .login-btn {
+            background: var(--primary);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            background: #357ABD;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
+        }
+
+        .hero { text-align: center; padding: 60px 20px; }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            padding: 0 5% 50px;
+            align-items: start; /* Чтобы карточки не растягивались по высоте соседа */
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid #eee;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        .card h3 { 
+            margin: 10px 0; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+
+        .card h3::after {
+            content: '↓';
+            color: var(--primary);
+            font-size: 1.2rem;
+            transition: 0.3s;
+        }
+
+        .card.active h3::after { transform: rotate(180deg); }
+
+        /* Контейнер для текста с анимацией Grid */
+        .card-details {
+            display: grid;
+            grid-template-rows: 0fr;
+            opacity: 0;
+            transition: grid-template-rows 0.4s ease, opacity 0.3s ease, margin 0.3s ease;
+            overflow: hidden;
+            font-size: 0.95rem;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .card.active .card-details {
+            grid-template-rows: 1fr;
+            opacity: 1;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .card-details-inner {
+            min-height: 0;
+        }
+
+        .icon { font-size: 2.2rem; }
+
+        /* Модальное окно */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--overlay);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+    .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 380px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            position: relative;
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .auth-form h2 { margin-top: 0; text-align: center; margin-bottom: 25px; }
+        
+        .auth-form input {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .auth-form input:focus { border-color: var(--primary); }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .submit-btn:hover { background: #357ABD; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="#" class="logo">EduMethod</a>
+        <button class="login-btn" onclick="toggleModal(true)">Личный кабинет</button>
+    </header>
+
+    <div class="modal-overlay" id="loginModal" onclick="toggleModal(false)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="close-btn" onclick="toggleModal(false)">&times;</span>
+            <div class="auth-form">
+                <h2>Вход в кабинет</h2>
+                <input type="email" placeholder="Email">
+                <input type="password" placeholder="Пароль">
+                <button class="submit-btn">Войти</button>
+                <p style="text-align: center; color: #888; font-size: 0.85rem; margin-top: 20px;">
+                    Нет аккаунта? <a href="#" style="color: var(--primary); text-decoration: none;">Создать</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <section class="hero">
+        <h1>Центр дополнительного профессионального образования "Экосредагрупп"</h1>
+        <p>Интерактивные инструменты для современного учителя</p>
+    </section>
+
+    <div class="grid">
+        <div class="card" onclick="toggleCard(this)">
+            <span class="icon">📋</span>
+            <h3>Программа обучения</h3>
+            <div class="card-details">
+                <div class="card-details-inner">
+                    <p>Образовательная организация реализует программы профессиональной переподготовки, повышения квалификации и профессионального обучения.</p>
+                    <p><strong>Программа «Менеджмент и управление деятельностью организации» (432 ч.):</strong> Программа предназначена для лиц, имеющих среднее профессиональное или высшее образование и планирующих осуществлять управленческую деятельность либо расширить профессиональные компетенции в сфере менеджмента. Целью программы является формирование системных знаний и практических навыков в области управления организацией, планирования и координации деятельности, принятия управленческих решений и оценки их эффективности. В рамках программы изучаются основы управления организацией, организационная структура и управленческие процессы, управленческие решения и ответственность, деловые коммуникации, цифровые инструменты управленческой деятельности, основы проектного и стратегического управления, управление персоналом и изменениями. Освоение программы позволяет выпускникам осуществлять управленческие функции на уровне подразделений и организации в целом.</p>
+                    <p><strong>Программа «Управление и администрирование» (360 ч.):</strong> Программа ориентирована на подготовку специалистов в области административного и организационного управления и предназначена для лиц, имеющих среднее профессиональное или высшее образование. Целью программы является формирование компетенций, необходимых для организации и сопровождения управленческих процессов, обеспечения взаимодействия структурных подразделений и административной поддержки деятельности организации. В содержание программы включены вопросы построения организационной структуры, регламентации управленческих процессов, принятия и реализации управленческих решений, деловых коммуникаций, ответственности должностных лиц и использования цифровых инструментов в администрировании.</p>
+                    <p><strong>Повышение квалификации «Основы управления и командной работы» (84 ч.):</strong> Программа предназначена для специалистов и руководителей, осуществляющих профессиональную деятельность и нуждающихся в актуализации управленческих знаний и навыков. Целью программы является развитие компетенций в области управления коллективом, организации совместной деятельности и эффективного взаимодействия в команде. В ходе обучения рассматриваются базовые принципы управления, распределение ролей и задач, методы деловой коммуникации и основы командного взаимодействия.</p>
+                    <p><strong>Повышение квалификации «Лидерство и принятие решений» (84 ч.):</strong>Программа направлена на развитие лидерских качеств и управленческого мышления у специалистов и руководителей. Целью программы является совершенствование навыков принятия управленческих решений в условиях неопределённости и изменений, а также формирование ответственности за результаты управленческой деятельности. В рамках программы изучаются типы управленческих решений, методы анализа управленческих ситуаций и основы управления изменениями.</p>
+                    <p><strong>Повышение квалификации «Специалист по организационному управлению» (84 ч.):</strong>Программа относится к программам профессионального обучения с выдачей свидетельства о профессии должности служащего и предназначена для лиц, не имеющих профильного образования, начинающих специалистов и административного персонала. Целью программы является формирование базовых профессиональных компетенций в сфере организационного управления и администрирования. В содержание программы входят основы управления организацией, организационная структура и управленческие процессы, управленческие решения и ответственность, деловые коммуникации, цифровые инструменты управленческой деятельности и основы проектного управления.</p>
+                    <p>Освоение программ позволяет выпускникам осуществлять управленческие функции на уровне подразделений и организации в целом.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" onclick="toggleCard(this)">
+            <span class="icon">🎮</span>
+<h3>Информация об организации</h3>
+            <div class="card-details">
+                <div class="card-details-inner">
+                   ООО «Центр дополнительного профессионального образования „Экосредагрупп“» осуществляет деятельность в сфере ДПО.
+                   <br><br>
+                   <strong>Контакты и реквизиты:</strong><br>
+                   ОГРН: 1256800002073.<br>
+                   ИНН/КПП: 6800014973 / 680001001.<br>
+                   Директор: Князев Никита Дмитриевич.
+                </div>
+            </div>
+        </div>
+
+        <div class="card" onclick="toggleCard(this)">
+            <span class="icon">📊</span>
+            <h3>Электронная образовательная среда</h3>
+            <div class="card-details">
+                <div class="card-details-inner">
+                    Для реализации образовательных программ используется электронная среда на базе платформы <strong>Stepik</strong>. 
+                    Она обеспечивает доступ к материалам, тестированию и интерактивным заданиям. Платформа позволяет организовать обучение с применением дистанционных технологий и обеспечивает плотное взаимодействие ученика и преподавателя.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleCard(card) {
+            const isActive = card.classList.contains('active');
+            
+            // Если нужно, чтобы одновременно была открыта только одна карточка, 
+            // расскомментируйте строку ниже:
+            // document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+
+            card.classList.toggle('active');
+
+            // Умная прокрутка: если карточка открывается и уходит за экран
+            if (!isActive) {
+                setTimeout(() => {
+                    const rect = card.getBoundingClientRect();
+                    const isOffScreen = rect.bottom > window.innerHeight;
+                    
+                    if (isOffScreen) {
+                        window.scrollBy({
+                            top: rect.bottom - window.innerHeight + 40, // +40px отступ снизу
+                            behavior: 'smooth'
+                        });
+                    }
+                }, 400); // Ждем окончания анимации CSS
+            }
+        }
+
+        function toggleModal(show) {
+            const modal = document.getElementById('loginModal');
+            modal.style.display = show ? 'flex' : 'none';
+            document.body.style.overflow = show ? 'hidden' : 'initial';
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') toggleModal(false);
+        });
+    </script>
+
+</body>
+</html>
